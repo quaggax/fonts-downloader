@@ -1,6 +1,6 @@
-# Download Fonts from any Stylesheet
+# Download Fonts from Google Fonts
 
-explaination of the script
+This script downloads the otherwise inaccessible Web Font Formats from a provided Google Fonts stylesheet and generates a SCSS partial to easily import into a project.
 
 This Script contacts external (web) servers. You are responsible for the servers that are contacted as a result of the use of this script.
 
@@ -15,7 +15,15 @@ brew install python
 
 Make sure to close and reopen your shell afterwards for all changes to take effect.
 
-Only Google Fonts is supported at the moment.
+### Options
+
+| Option      | Default Value | Notes                                                                                                     |
+| ----------- | ------------- | --------------------------------------------------------------------------------------------------------- |
+| input_url   | -             | escape using quotes                                                                                       |
+| prefix_path | /assets/fonts | (optional) sets a path prefix in the generated SCSS file; don't use a trailing slash here                 |
+| dir_path    | fonts/        | (optional) folder to save files to; a subfolder will be created with the fonts name; use a trailing slash |
+
+Scheme: `python3.11 download-fonts.py input_url [prefix_path] [dir_path]`
 
 Example:
 

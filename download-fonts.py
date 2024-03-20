@@ -59,27 +59,39 @@ font_face_declarations = re.findall('/\*\s*(?P<UNICODE_NAME>[^\s]+)\s*\*/(?P<CSS
 # create array with font-face objects
 fonts = []
 for font_face_declaration in font_face_declarations:
-    unicode_name = font_face_declaration[0]
+    # assigns val the @font-face delcaration (second regex capture group)
     val = font_face_declaration[1]
 
-    font_family = re.findall('font-family: [\"\']([^\"\']+)', val)[0]
-    font_style = re.findall('font-style: ([^;]+)', val)[0]
-    font_weight = re.findall('font-weight: ([^;]+)', val)[0]
-    font_stretch = re.findall('font-stretch: ([^;]+)', val)[0]
-    font_display = re.findall('font-display: ([^;]+)', val)[0]
-    font_src = re.findall('url\((.*?)\)', val)[0]
-    font_unicode_range = re.findall('unicode-range: ([^;]*)', val)[0]
+    font_dict = {
+        "font-family": re.findall('font-family: [\"\']([^\"\']+)', val),
+        "font-style": re.findall('font-style: ([^;]+)', val),
+        "font-weight": re.findall('font-weight: ([^;]+)', val),
+        "font-stretch": re.findall('font-stretch: ([^;]+)', val),
+        "font-display": re.findall('font-display: ([^;]+)', val),
+        "src": re.findall('url\((.*?)\)', val),
+        "unicode-range": re.findall('unicode-range: ([^;]*)', val),
+    }
+
+    # makes sure regex returned something before accesing it and assinging the first (and only) value
+    for attribute in font_dict:
+        if len(font_dict[attribute]) == 0:
+            font_dict[attribute] = ""
+        else:
+            font_dict[attribute] = font_dict[attribute][0]
+
+    # adds the unicode name after checking all regex extracted CSS properties exist
+    font_dict["unicode-name"] = font_face_declaration[0]
 
     fonts.append(
         {
-            "font-family": font_family,
-            "font-style": font_style,
-            "font-weight": font_weight,
-            "font-stretch": font_stretch,
-            "font-display": font_display,
-            "src": font_src,
-            "unicode-range": font_unicode_range,
-            "unicode-name": unicode_name
+            "font-family": font_dict["font-family"],
+            "font-style": font_dict["font-style"],
+            "font-weight": font_dict["font-weight"],
+            "font-stretch": font_dict["font-stretch"],
+            "font-display": font_dict["font-display"],
+            "src": font_dict["src"],
+            "unicode-range": font_dict["unicode-range"],
+            "unicode-name": font_dict["unicode-name"]
         }
     )
 
@@ -135,6 +147,7 @@ for i, item in enumerate(fonts):
 # scss_fonts = re.sub(r'\s+', ' ', scss_fonts) # remove consecutive spaces
 
 scss_file = f"""@use "sass:map";
+@use "sass:string";
 
 $fonts: [{scss_fonts}];
 """
@@ -143,18 +156,33 @@ scss_file += """
 @each $item in $fonts {
     /* #{map.get($item, "unicode-name")} */
     @font-face {
-       	font-family: map.get($item, "font-family");
-       	font-style: map.get($item, "font-style");
-       	font-weight: map.get($item, "font-weight");
-       	font-display: map.get($item, "font-display");
-       	src: url("#{map.get($item, 'font-path')}") format(map.get($item, "font-format"));
-       	unicode-range: map.get($item, "unicode-range");
+        @if string.length(map.get($item, "font-family")) > 0 {
+            font-family: map.get($item, "font-family");
+        }
+        @if string.length(map.get($item, "font-style")) > 0 {
+            font-style: map.get($item, "font-style");
+        }
+        @if string.length(map.get($item, "font-weight")) > 0 {
+            font-weight: map.get($item, "font-weight");
+        }
+        @if string.length(map.get($item, "font-stretch")) > 0 {
+            font-stretch: map.get($item, "font-stretch");
+        }
+        @if string.length(map.get($item, "font-display")) > 0 {
+            font-display: map.get($item, "font-display");
+        }
+        @if string.length(map.get($item, "font-path")) > 0 {
+            src: url("#{map.get($item, 'font-path')}") format(map.get($item, "font-format"));
+        }
+        @if string.length(map.get($item, "unicode-range")) > 0 {
+            unicode-range: map.get($item, "unicode-range");
+        }
     }
 }
 """
 
 # save SCSS file
-scss_path = save_base + font_family_websafe + ".scss"
+scss_path = save_base + "_" + font_family_websafe + ".scss"
 open(scss_path, "w").write(scss_file)
 print("Saving generated SCSS file")
 
