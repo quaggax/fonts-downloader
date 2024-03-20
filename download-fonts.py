@@ -157,25 +157,25 @@ scss_file += """
     /* #{map.get($item, "unicode-name")} */
     @font-face {
         @if string.length(map.get($item, "font-family")) > 0 {
-            font-family: map.get($item, "font-family");
+            font-family: '#{map.get($item, "font-family")}';
         }
         @if string.length(map.get($item, "font-style")) > 0 {
-            font-style: map.get($item, "font-style");
+            font-style: #{map.get($item, "font-style")};
         }
         @if string.length(map.get($item, "font-weight")) > 0 {
-            font-weight: map.get($item, "font-weight");
+            font-weight: #{map.get($item, "font-weight")};
         }
         @if string.length(map.get($item, "font-stretch")) > 0 {
-            font-stretch: map.get($item, "font-stretch");
+            font-stretch: #{map.get($item, "font-stretch")};
         }
         @if string.length(map.get($item, "font-display")) > 0 {
-            font-display: map.get($item, "font-display");
+            font-display: #{map.get($item, "font-display")};
         }
         @if string.length(map.get($item, "font-path")) > 0 {
-            src: url("#{map.get($item, 'font-path')}") format(map.get($item, "font-format"));
+            src: url(#{map.get($item, 'font-path')}) format('#{map.get($item, "font-format")}');
         }
         @if string.length(map.get($item, "unicode-range")) > 0 {
-            unicode-range: map.get($item, "unicode-range");
+            unicode-range: #{map.get($item, "unicode-range")};
         }
     }
 }
